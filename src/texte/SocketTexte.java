@@ -47,19 +47,19 @@ public class SocketTexte extends Thread{
         // on recupère le socket
         this.socket = socket;
         // Creation du flux
-        display("Le thread essaye de creer les objets de gestion de flux");
+        display("Le thread essaye de creer les objets de gestion de flux", 2);
         try
         {
             sOutput = new ObjectOutputStream(socket.getOutputStream());
             sInput  = new ObjectInputStream(socket.getInputStream());
             // On lit le pseudo
             usernameClient = (String) sInput.readObject();
-            display(usernameClient + " s'est connecte.");
+            display(usernameClient + " s'est connecte.", 1);
             // On envoit son pseudo
             sOutput.writeObject(monPseudo);
         }
         catch (IOException e) {
-            display("Exception creating new Input/output Streams: " + e);
+            display("Exception creating new Input/output Streams: " + e, 2);
             return;
         }
         catch (ClassNotFoundException e) {
@@ -101,7 +101,7 @@ public class SocketTexte extends Thread{
                 try {
                     cm = (Message) sInput.readObject();
                 } catch (IOException e) {
-                    display(usernameClient + " Exception reading Streams: " + e);
+                    display(usernameClient + " Exception reading Streams: " + e, 2);
                     break;
                 } catch (ClassNotFoundException e2) {
                     break;
@@ -113,10 +113,10 @@ public class SocketTexte extends Thread{
                 switch (cm.getType()) {
 
                     case Message.MESSAGE:
-                        display(usernameClient + " : " + message);
+                        display(usernameClient + " : " + message, 1);
                         break;
                     case Message.LOGOUT:
-                        display(usernameClient + " disconnected with a LOGOUT message.");
+                        display(usernameClient + " disconnected with a LOGOUT message.", 1);
                         keepGoing = false;
                         break;
 
@@ -155,8 +155,8 @@ public class SocketTexte extends Thread{
         }
         // Si il y a une erreur on informe l'utilisateur
         catch(IOException e) {
-            display("Error sending message to " + usernameClient);
-            display(e.toString());
+            display("Error sending message to " + usernameClient, 1);
+            display(e.toString(), 1);
         }
         return true;
     }
@@ -165,7 +165,7 @@ public class SocketTexte extends Thread{
     protected boolean writeMsg(Message msg) {
         // Si le client est toujours connecté
         if(!socket.isConnected()) {
-            display("?");
+            display("?", 2);
             close();
             return false;
         }
@@ -176,8 +176,8 @@ public class SocketTexte extends Thread{
         }
         // Si il y a une erreur on informe l'utilisateur
         catch(IOException e) {
-            display("Error sending message to " + usernameClient);
-            display(e.toString());
+            display("Error sending message to " + usernameClient, 1);
+            display(e.toString(), 1);
         }
         return true;
     }
@@ -190,7 +190,7 @@ public class SocketTexte extends Thread{
         }
         // Si ce la échoue
         catch(Exception ec) {
-            display("Error connectiong to server:" + ec);
+            display("Error connectiong to server:" + ec, 2);
             return false;
         }
         String msg = "Connection accepted " + socket.getInetAddress() + ":" + socket.getPort();
@@ -203,7 +203,7 @@ public class SocketTexte extends Thread{
             sOutput = new ObjectOutputStream(socket.getOutputStream());
         }
         catch (IOException eIO) {
-            display("Exception creating new Input/output Streams: " + eIO);
+            display("Exception creating new Input/output Streams: " + eIO, 2);
             return false;
         }
 
@@ -213,10 +213,10 @@ public class SocketTexte extends Thread{
             sOutput.writeObject(monPseudo);
             // On lit le pseudo
             usernameClient = (String) sInput.readObject();
-            display(usernameClient + " s'est connecte.");
+            display(usernameClient + " s'est connecte.", 2);
         }
         catch (IOException eIO) {
-            display("Exception doing login : " + eIO);
+            display("Exception doing login : " + eIO, 2);
             close();
             return false;
         } catch (ClassNotFoundException e) {
@@ -226,8 +226,12 @@ public class SocketTexte extends Thread{
         return true;
     }
 
-    public void display(String str){
-        if(gui != null) gui.append(str);
-        System.out.println(str);
+    public void display(String str, int type){
+        if (type == 1){
+            if(gui != null) gui.append(str);
+        }
+        else if (type == 2){
+            System.out.println(str);
+        }
     }
 }

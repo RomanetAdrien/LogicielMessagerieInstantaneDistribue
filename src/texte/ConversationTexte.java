@@ -139,6 +139,8 @@ class ClientGUI extends JFrame implements ActionListener {
         // if it is the Logout button
         if (o == logout) {
             s.writeMsg(new Message(Message.LOGOUT, ""));
+            s.close();
+            append("Vous vous êtes déconecté");
             return;
         }
 
