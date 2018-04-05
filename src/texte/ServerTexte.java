@@ -58,23 +58,16 @@ public class ServerTexte implements Runnable {
                 // if I was asked to stop
                 if(!keepGoing)
                     break;
-                SocketTexte t = new SocketTexte(socket);  // make a thread of it
-                ApplicationTexte.socketTexteList.add(t);									// save it in the ArrayList
+                ConversationTexte t = new ConversationTexte(socket);  // make a thread of it
+                ApplicationTexte.ConversationTexteList.add(t);									// save it in the ArrayList
                 t.start();
             }
             // I was asked to stop
             try {
                 serverSocket.close();
-                for(int i = 0; i < ApplicationTexte.socketTexteList.size(); ++i) {
-                    SocketTexte tc = ApplicationTexte.socketTexteList.get(i);
-                    try {
-                        tc.sInput.close();
-                        tc.sOutput.close();
-                        tc.socket.close();
-                    }
-                    catch(IOException ioE) {
-                        // not much I can do
-                    }
+                for(int i = 0; i < ApplicationTexte.ConversationTexteList.size(); ++i) {
+                    ConversationTexte tc = ApplicationTexte.ConversationTexteList.get(i);
+                    tc.close();
                 }
             }
             catch(Exception e) {
@@ -91,11 +84,11 @@ public class ServerTexte implements Runnable {
     // for a client who logoff using the LOGOUT message
     synchronized void remove(int id) {
         // scan the array list until we found the Id
-        for(int i = 0; i < ApplicationTexte.socketTexteList.size(); ++i) {
-            SocketTexte ct = ApplicationTexte.socketTexteList.get(i);
+        for(int i = 0; i < ApplicationTexte.ConversationTexteList.size(); ++i) {
+            ConversationTexte ct = ApplicationTexte.ConversationTexteList.get(i);
             // found it
-            if(ct.id == id) {
-                ApplicationTexte.socketTexteList.remove(i);
+            if(ct.getId() == id) {
+                ApplicationTexte.ConversationTexteList.remove(i);
                 return;
             }
         }
