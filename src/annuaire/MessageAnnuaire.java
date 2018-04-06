@@ -14,7 +14,7 @@ public class MessageAnnuaire implements Serializable{
     // WHOISIN demande la liste des utilisateurs
     // ALLUSERS message de réponse a la demande de la liste des utilisateurs
     // LOGOUT message de déconnexion
-    public static final int WHOISIN = 1, ALLUSERS = 2, LOGGOUT = 3;
+    public static final int WHOISIN = 1, ALLUSERS = 2, LOGOUT = 3;
     private int type;
     private ArrayList<UtilisateurSimple> listeUtilisateurs;
 

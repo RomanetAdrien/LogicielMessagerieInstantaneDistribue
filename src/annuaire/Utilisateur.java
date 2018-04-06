@@ -12,6 +12,7 @@ public class Utilisateur {
      */
     private String pseudo;
     private String ip;
+    private int port;
     private int id;
     private SocketAnnuaire socketAnnuaire;
 
@@ -21,16 +22,18 @@ public class Utilisateur {
     // Créer un utilisateur depuis le serveurAnnuaire
     public Utilisateur(Socket socket){
         this.pseudo = "null";
-        this.pseudo = "null";
+        this.ip = socket.getInetAddress().toString();
+        this.port = socket.getPort();
         id = ++Annuaire.uniqueID;
-        socketAnnuaire = new SocketAnnuaire(socket);
+        socketAnnuaire = new SocketAnnuaire(socket, this);
     }
     // Créer un utlisateur lors de la première connexion
     public Utilisateur(String ip, int port){
         this.pseudo = "null";
-        this.pseudo = "null";
+        this.ip = ip;
+        this.port = port;
         id = ++Annuaire.uniqueID;
-        socketAnnuaire = new SocketAnnuaire(ip, port);
+        socketAnnuaire = new SocketAnnuaire(ip, port, this);
     }
 
     /**
@@ -49,6 +52,10 @@ public class Utilisateur {
         return id;
     }
 
+    public int getPort() {
+        return port;
+    }
+
     /**
      * Setters
      */
@@ -64,6 +71,10 @@ public class Utilisateur {
         this.id = id;
     }
 
+    public void setPort(int port) {
+        this.port = port;
+    }
+
     /**
      * Methodes
      */
@@ -71,5 +82,10 @@ public class Utilisateur {
     public UtilisateurSimple creerUtilisateurSimple(){
         UtilisateurSimple u = new UtilisateurSimple(this.ip, this.pseudo);
         return u;
+    }
+
+    // Fermer le socket
+    public void fermer(){
+        socketAnnuaire.close();
     }
 }
