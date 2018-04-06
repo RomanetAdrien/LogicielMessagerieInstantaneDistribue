@@ -6,11 +6,12 @@ import java.util.ArrayList;
  * Created by adrien on 26/03/2018.
  *
  *
- * A la fois annuaire et serveur
+ *
  */
 public class Annuaire {
     /** Variables */
-    private ArrayList<Utilisateur> tab = new ArrayList();
+    public static ArrayList<Utilisateur> tab = new ArrayList();
+    protected static int uniqueID;
 
     /** Contructeur */
     public Annuaire(){
@@ -23,8 +24,8 @@ public class Annuaire {
 
     /** Methode */
     // NouvelleUtilisateur
-    public void nouvelleUtilisateur(String pseudo, String ipv4, String ipv6, int statut, int id){
-        Utilisateur u = new Utilisateur(pseudo,ipv4,ipv6,statut,id);
+    public void nouvelleUtilisateur(String pseudo, String ip, int statut, int id){
+        Utilisateur u = new Utilisateur(pseudo,ip,statut,id);
         tab.add(u);
     }
 
