@@ -25,4 +25,9 @@ public class UtilisateurSimple {
     public String getPseudo() {
         return pseudo;
     }
+
+    @Override
+    public String toString() {
+        return pseudo;
+    }
 }

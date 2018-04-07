@@ -59,6 +59,13 @@ public class Annuaire {
         }
     }
 
+    // On veut la taille de l'annuaire
+    public int taille(){
+        return tab.size();
+    }
+
+    // On obtient un utilisateur selon son id.
+
 
 
 

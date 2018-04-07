@@ -52,7 +52,7 @@ public class ServerTexte implements Runnable {
             while(keepGoing)
             {
                 // Attends une connexion
-                System.out.println("Server waiting for Clients on port " + port + ".");
+                System.out.println("Server Texte waiting for Clients on port " + port + ".");
 
                 Socket socket = serverSocket.accept();  	// accept connection
                 // if I was asked to stop

@@ -22,7 +22,7 @@ public class SocketAnnuaire extends Thread{
     private String date;
     // Les pseudos
     private String pseudoDistant;
-    private String monPseudo;
+    private String monPseudo = ApplicationAnnuaire.monPseudo;
     // L'utilisateur parent
     private Utilisateur utilisateur;
     // Adresse et port distant pour l'ouverture d'une connexion
@@ -51,6 +51,7 @@ public class SocketAnnuaire extends Thread{
             // On lit le pseudo
             pseudoDistant = (String) sInput.readObject();
             System.out.println(pseudoDistant+ " s'est connecte.");
+            utilisateur.setPseudo(pseudoDistant);
             // On envoit son pseudo
             sOutput.writeObject(monPseudo);
         }
@@ -148,6 +149,9 @@ public class SocketAnnuaire extends Thread{
             // On lit le pseudo
             pseudoDistant = (String) sInput.readObject();
             System.out.println(pseudoDistant+ " s'est connecte.");
+            utilisateur.setPseudo(pseudoDistant);
+            // On demande la liste des gens
+            demandeWHOISIN();
         }
         catch (IOException eIO) {
             System.out.println("Erreur durant la connexion: " + eIO);
@@ -188,6 +192,27 @@ public class SocketAnnuaire extends Thread{
         // On récupere la liste des utilisateurs et on l'ecrit sur le flux
         try {
             MessageAnnuaire msg = new MessageAnnuaire(2);
+            msg.setListeUtilisateurs(ApplicationAnnuaire.annuaire.obtenirTousLesUtilisateurs());
+            sOutput.writeObject(msg);
+        }
+        // Si il y a une erreur on informe l'utilisateur
+        catch(IOException e) {
+            System.out.println("Erreur lors de l'envoi du message à " + pseudoDistant);
+            System.out.println(e.toString());
+        }
+        return true;
+    }
+
+    // Emetre une demande WHOISIN
+    public boolean demandeWHOISIN(){
+        // Si le client est toujours connecté
+        if(!socket.isConnected()) {
+            System.out.println("Le socket est déconnecte");
+            close();
+            return false;
+        }
+        try {
+            MessageAnnuaire msg = new MessageAnnuaire(1);
             sOutput.writeObject(msg);
         }
         // Si il y a une erreur on informe l'utilisateur

@@ -5,16 +5,20 @@ public class ApplicationAnnuaire {
      * Variable
      */
     protected static Annuaire annuaire;
+    public static String monPseudo;
     private ServeurAnnuaire serveur;
+    private AnnuaireGUI gui;
 
     /**
      * Constructeur
      */
-    public ApplicationAnnuaire(int port){
+    public ApplicationAnnuaire(String pseudo,int port){
         annuaire = new Annuaire();
         serveur = new ServeurAnnuaire(port);
+        monPseudo = pseudo;
         // On demmare le serveur
         serveur.start();
+        gui = new AnnuaireGUI(this);
     }
 
     /**

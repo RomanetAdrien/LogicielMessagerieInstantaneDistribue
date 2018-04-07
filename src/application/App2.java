@@ -15,7 +15,7 @@ public class App2 {
         String userName = "Elos";
         ApplicationTexte appTexte = new ApplicationTexte(1500, userName);
         int portNumber = 1500;
-        String serverAddress = "192.168.137.184";
+        String serverAddress = "192.168.0.118";
         //String serverAddress = "localhost";
         //appTexte.nouveauChat(serverAddress,portNumber,userName);
     }

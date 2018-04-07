@@ -46,12 +46,13 @@ public class ServeurAnnuaire extends Thread{
             while(keepGoing)
             {
                 // Attends une connexion
-                System.out.println("Server waiting for Clients on port " + port + ".");
+                System.out.println("Server Annuaire waiting for Clients on port " + port + ".");
 
                 Socket socket = serverSocket.accept();  	// accept connection
                 // if I was asked to stop
                 if(!keepGoing)
                     break;
+                if(socket.getInetAddress().toString() != "/127.0.0.1")
                 ApplicationAnnuaire.annuaire.ajouterNouveauUtilisateur(socket);
             }
             // I was asked to stop
