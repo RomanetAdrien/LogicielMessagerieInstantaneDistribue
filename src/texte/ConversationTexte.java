@@ -98,7 +98,7 @@ class ClientGUI extends JFrame implements ActionListener {
         southPanel.add(logout);
         add(southPanel, BorderLayout.SOUTH);
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setSize(600, 600);
         setVisible(true);
         tf.requestFocus();
@@ -138,9 +138,14 @@ class ClientGUI extends JFrame implements ActionListener {
         Object o = e.getSource();
         // if it is the Logout button
         if (o == logout) {
-            s.writeMsg(new Message(Message.LOGOUT, ""));
-            s.close();
-            append("Vous vous êtes déconecté");
+            try {
+                s.writeMsg(new Message(Message.LOGOUT, ""));
+                s.close();
+                append("Vous vous êtes déconecté");
+            }catch (Exception err){
+
+            }
+            dispose();
             return;
         }
 

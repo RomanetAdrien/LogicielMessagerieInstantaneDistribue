@@ -18,9 +18,9 @@ public class AnnuaireGUI extends JFrame implements ActionListener {
     /**
      * Variable swing
      */
-    // to hold the server address an the port number
+    // Les conteneur pour l'adresse et le port d'un noeud du réseau
     private JTextField tfServer, tfPort;
-    // to Logout and get the list of the users
+    // Les boutons
     private JButton login, logout, actualiser, txt, call;
     // Liste des Utilisateurs connectés
     private ArrayList<UtilisateurSimple> listeUtilisateursConnectes;
@@ -36,23 +36,23 @@ public class AnnuaireGUI extends JFrame implements ActionListener {
         jComboBox = new JComboBox<UtilisateurSimple>();
         actualiserListeUtilisateur();
 
-        // The NorthPanel with:
+        // Le panneau du nord
         JPanel northPanel = new JPanel(new GridLayout(3,1));
-        // the server name anmd the port number
+        // Une sous section du panneau nord
         JPanel serverAndPort = new JPanel(new GridLayout(1,5, 1, 3));
-        // the two JTextField with default value for server address and port number
+        // On ajoute a cette sous section les champs ip et port
         tfServer = new JTextField("localhost");
         tfPort = new JTextField("1500");
         tfPort.setHorizontalAlignment(SwingConstants.RIGHT);
-
         serverAndPort.add(new JLabel("Server Address:  "));
         serverAndPort.add(tfServer);
         serverAndPort.add(new JLabel("Port Number:  "));
         serverAndPort.add(tfPort);
         serverAndPort.add(new JLabel(""));
-        // adds the Server an port field to the GUI
+
         northPanel.add(serverAndPort);
         northPanel.add(jComboBox);
+        
         JPanel boutonsCom = new JPanel(new GridLayout(1,2, 1, 3));
         txt = new JButton("Conversation texte");
         txt.addActionListener(this);
