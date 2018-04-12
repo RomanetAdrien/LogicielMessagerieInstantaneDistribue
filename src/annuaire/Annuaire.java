@@ -1,16 +1,18 @@
 package annuaire;
 
+import java.net.Socket;
 import java.util.ArrayList;
 
 /**
  * Created by adrien on 26/03/2018.
  *
  *
- * A la fois annuaire et serveur
+ *
  */
 public class Annuaire {
     /** Variables */
-    private ArrayList<Utilisateur> tab = new ArrayList();
+    public static ArrayList<Utilisateur> tab = new ArrayList();
+    protected static int uniqueID;
 
     /** Contructeur */
     public Annuaire(){
@@ -22,36 +24,47 @@ public class Annuaire {
     /** Setter */
 
     /** Methode */
-    // NouvelleUtilisateur
-    public void nouvelleUtilisateur(String pseudo, String ipv4, String ipv6, int statut, int id){
-        Utilisateur u = new Utilisateur(pseudo,ipv4,ipv6,statut,id);
+    // Ajouter un nouveau utilisateur depuis une connexion entrante
+    public void ajouterNouveauUtilisateur(Socket socket){
+        Utilisateur u = new Utilisateur(socket);
         tab.add(u);
     }
 
-    public void ajouterUtilisateur(Utilisateur u){
+    // Ajouter un utilisateur pour la première connexion
+    public void ajouterNouveauUtilisateurDirect(String ip, int port){
+        Utilisateur u = new Utilisateur(ip,port);
         tab.add(u);
     }
 
-    public void retirerUtilisateur(int id){
-        if(tab.isEmpty()==false){
-            for(int i=0 ; i<tab.size() ; i++){
-                if(tab.get(i).getId() == id){
-                    tab.remove(i);
-                }
-            }
+    // Generer un arraylist contenant tout les utilisateurs
+    public ArrayList<UtilisateurSimple> obtenirTousLesUtilisateurs(){
+        ArrayList<UtilisateurSimple> l = new ArrayList<UtilisateurSimple>();
+        for(int i=0 ; i<tab.size() ; i++){
+            l.add(tab.get(i).creerUtilisateurSimple());
+        }
+        return l;
+    }
+
+    // On supprime un utilisateur
+    public void supprimerUtilisateur(Utilisateur user){
+        user.fermer();
+        tab.remove(user);
+    }
+
+    // On ferme toutes les connexions
+    public void fermerLesConnexions(){
+        for(int i=tab.size()-1 ; i>=0 ; i--){
+            tab.get(i).fermer();
+            tab.remove(i);
         }
     }
 
-    public Utilisateur getUtilisateur(String nom){
-        if(tab.isEmpty()==false){
-            for(int i=0 ; i<tab.size() ; i++){
-                if(tab.get(i).getPseudo() == nom){
-                    return tab.get(i);
-                }
-            }
-        }
-        return null;
+    // On veut la taille de l'annuaire
+    public int taille(){
+        return tab.size();
     }
+
+    // On obtient un utilisateur selon son id.
 
 
 

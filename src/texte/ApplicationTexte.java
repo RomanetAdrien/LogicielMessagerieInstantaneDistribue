@@ -12,24 +12,24 @@ public class ApplicationTexte{
     // L'executor pour la gestion des threads
     private static ExecutorService executor;
     // Une liste de client
-    protected static ArrayList<SocketTexte> socketTexteList;
+    protected static ArrayList<ConversationTexte> ConversationTexteList;
     // Le server de reception des nouvelles connexions
     ServerTexte serverTexte;
     // Mon nom
-    private String usernameMoi;
+    public static String monPseudo;
 
     /**
      * Constructeur
      */
-    public ApplicationTexte(int port, String usernameMoi){
+    public ApplicationTexte(int port, String monPseudo){
         // On initialise l'executor
         executor = Executors.newFixedThreadPool(2);
         // On initialise le tableau de socket
-        socketTexteList = new ArrayList<SocketTexte>();
+        ConversationTexteList = new ArrayList<ConversationTexte>();
         // On initialise le serveur de connexion entrante
         serverTexte = new ServerTexte(port);
         // On initialise le pseudo
-        this.usernameMoi = usernameMoi;
+        this.monPseudo = monPseudo;
         // on lance le serveur dans un thread via l'executor
         executor.execute(serverTexte);
     }
@@ -39,8 +39,8 @@ public class ApplicationTexte{
      */
 
     public void nouveauChat(String serverAddress, int portNumber){
-        SocketTexte s = new SocketTexte(serverAddress,portNumber,usernameMoi);
-        socketTexteList.add(s);
-        s.start();
+        ConversationTexte c = new ConversationTexte(serverAddress,portNumber);
+        ConversationTexteList.add(c);
+        c.start();
     }
 }

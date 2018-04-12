@@ -1,15 +1,11 @@
 package texte;
 
-import annuaire.Utilisateur;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Date;
-import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 
 /**
  * Créer par Antoine le 01/04/2018
@@ -33,13 +29,13 @@ public class SocketTexte extends Thread{
     String date;
     // Le pseudo
     String usernameClient;
-    String usernameMoi;
+    String monPseudo = ApplicationTexte.monPseudo;
     // Adresse et port distant
     String ip;
     int port;
-    // Exexutor pour la gestion des threads
-    private static ExecutorService executor = Executors.newFixedThreadPool(2);
-    ConversationTexte conv;
+
+    // lien vers l'interface
+    private ClientGUI gui;
 
     /**
      * Constructeur
@@ -51,48 +47,47 @@ public class SocketTexte extends Thread{
         // on recupère le socket
         this.socket = socket;
         // Creation du flux
-        System.out.println("Le thread essaye de creer les objets de gestion de flux");
+        display("Le thread essaye de creer les objets de gestion de flux", 2);
         try
         {
             sOutput = new ObjectOutputStream(socket.getOutputStream());
             sInput  = new ObjectInputStream(socket.getInputStream());
             // On lit le pseudo
             usernameClient = (String) sInput.readObject();
-            System.out.println(usernameClient + " s'est connecte.");
+            display(usernameClient + " s'est connecte.", 1);
             // On envoit son pseudo
-            sOutput.writeObject(usernameMoi);
+            sOutput.writeObject(monPseudo);
         }
         catch (IOException e) {
-            System.out.println("Exception creating new Input/output Streams: " + e);
+            display("Exception creating new Input/output Streams: " + e, 2);
             return;
         }
         catch (ClassNotFoundException e) {
         }
 
         date = new Date().toString() + "\n";
-        conv = new ConversationTexte(this);
-        executor.execute(conv);
     }
 
     // Socket de connexion sortante
-    public SocketTexte(String server, int port, String username){
+    public SocketTexte(String server, int port){
         this.ip = server;
         this.port = port;
-        this.usernameMoi = username;
         boolean s = connexionSortante();
-
-        conv = new ConversationTexte(this);
-        executor.execute(conv);
     }
 
 
     /**
      * Getter
      */
-
+    public int getId2() {
+        return this.id;
+    }
     /**
      * Setter
      */
+    public void setGui(ClientGUI gui) {
+        this.gui = gui;
+    }
 
     /**
      * Methodes
@@ -106,7 +101,7 @@ public class SocketTexte extends Thread{
                 try {
                     cm = (Message) sInput.readObject();
                 } catch (IOException e) {
-                    System.out.println(usernameClient + " Exception reading Streams: " + e);
+                    display(usernameClient + " Exception reading Streams: " + e, 2);
                     break;
                 } catch (ClassNotFoundException e2) {
                     break;
@@ -118,10 +113,10 @@ public class SocketTexte extends Thread{
                 switch (cm.getType()) {
 
                     case Message.MESSAGE:
-                        System.out.println(usernameClient + " : " + message);
+                        display(usernameClient + " : " + message, 1);
                         break;
                     case Message.LOGOUT:
-                        System.out.println(usernameClient + " disconnected with a LOGOUT message.");
+                        display(usernameClient + " disconnected with a LOGOUT message.", 1);
                         keepGoing = false;
                         break;
 
@@ -160,8 +155,8 @@ public class SocketTexte extends Thread{
         }
         // Si il y a une erreur on informe l'utilisateur
         catch(IOException e) {
-            System.out.println("Error sending message to " + usernameClient);
-            System.out.println(e.toString());
+            display("Error sending message to " + usernameClient, 1);
+            display(e.toString(), 1);
         }
         return true;
     }
@@ -170,19 +165,19 @@ public class SocketTexte extends Thread{
     protected boolean writeMsg(Message msg) {
         // Si le client est toujours connecté
         if(!socket.isConnected()) {
-            System.out.println("?");
+            display("?", 2);
             close();
             return false;
         }
         // Ecrire le message sur le flux
         try {
             sOutput.writeObject(msg);
-            //System.out.println("envoyé a " + socket.getInetAddress());
+            //display("envoyé a " + socket.getInetAddress());
         }
         // Si il y a une erreur on informe l'utilisateur
         catch(IOException e) {
-            System.out.println("Error sending message to " + usernameClient);
-            System.out.println(e.toString());
+            display("Error sending message to " + usernameClient, 1);
+            display(e.toString(), 1);
         }
         return true;
     }
@@ -195,7 +190,7 @@ public class SocketTexte extends Thread{
         }
         // Si ce la échoue
         catch(Exception ec) {
-            System.out.println("Error connectiong to server:" + ec);
+            display("Error connectiong to server:" + ec, 2);
             return false;
         }
         String msg = "Connection accepted " + socket.getInetAddress() + ":" + socket.getPort();
@@ -208,20 +203,20 @@ public class SocketTexte extends Thread{
             sOutput = new ObjectOutputStream(socket.getOutputStream());
         }
         catch (IOException eIO) {
-            System.out.println("Exception creating new Input/output Streams: " + eIO);
+            display("Exception creating new Input/output Streams: " + eIO, 2);
             return false;
         }
 
         // On envoi son pseudo
         try
         {
-            sOutput.writeObject(usernameMoi);
+            sOutput.writeObject(monPseudo);
             // On lit le pseudo
             usernameClient = (String) sInput.readObject();
-            System.out.println(usernameClient + " s'est connecte.");
+            display(usernameClient + " s'est connecte.", 2);
         }
         catch (IOException eIO) {
-            System.out.println("Exception doing login : " + eIO);
+            display("Exception doing login : " + eIO, 2);
             close();
             return false;
         } catch (ClassNotFoundException e) {
@@ -229,5 +224,14 @@ public class SocketTexte extends Thread{
         }
         // tout a bien fonctionné
         return true;
+    }
+
+    public void display(String str, int type){
+        if (type == 1){
+            if(gui != null) gui.append(str);
+        }
+        else if (type == 2){
+            System.out.println(str);
+        }
     }
 }

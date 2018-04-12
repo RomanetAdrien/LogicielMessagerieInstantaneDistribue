@@ -3,7 +3,7 @@ package texte;
 import java.io.Serializable;
 
 /**
- * Cette classe définit les échanges attendu entre les clients
+ * Cette classe définit les échanges attendu entre les clients Texte
  */
 public class Message implements Serializable {
 

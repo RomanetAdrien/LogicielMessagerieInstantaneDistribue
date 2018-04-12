@@ -1,45 +1,47 @@
 package annuaire;
 
+import java.net.Socket;
+
 /**
  * Created by adrien on 26/03/2018.
  * modifié par antoine le 31/03/2018.
  */
 public class Utilisateur {
-    // Variables
+    /**
+     * Variables
+     */
     private String pseudo;
-    private String ipv4;
-    private String ipv6;
-    private int statut;
+    private String ip;
+    private int port;
     private int id;
+    private SocketAnnuaire socketAnnuaire;
 
     /**
      * Contructeurs
      */
-    // Créer un utilisateur déja renseigné
-    public Utilisateur(String pseudo, String ipv4, String ipv6, int statut, int id){
-        this.ipv4 = ipv4;
-        this.ipv6 = ipv6;
-        this.pseudo = pseudo;
-        this.statut = statut;
-        this.id = id;
+    // Créer un utilisateur depuis le serveurAnnuaire
+    public Utilisateur(Socket socket){
+        this.pseudo = "null";
+        this.ip = socket.getInetAddress().toString();
+        this.port = socket.getPort();
+        id = ++Annuaire.uniqueID;
+        socketAnnuaire = new SocketAnnuaire(socket, this);
+    }
+    // Créer un utlisateur lors de la première connexion
+    public Utilisateur(String ip, int port){
+        this.pseudo = "null";
+        this.ip = ip;
+        this.port = port;
+        id = ++Annuaire.uniqueID;
+        socketAnnuaire = new SocketAnnuaire(ip, port, this);
     }
 
-    // Créer un utilisateur vide
-    public Utilisateur(){
+    /**
+     * Getters
+     */
 
-    }
-
-    // Getters
-    public int getStatut() {
-        return statut;
-    }
-
-    public String getIpv4() {
-        return ipv4;
-    }
-
-    public String getIpv6() {
-        return ipv6;
+    public String getIp() {
+        return ip;
     }
 
     public String getPseudo() {
@@ -50,32 +52,40 @@ public class Utilisateur {
         return id;
     }
 
-    // Setters
-    public void setIpv4(String ipv4) {
-        this.ipv4 = ipv4;
+    public int getPort() {
+        return port;
     }
 
-    public void setIpv6(String ipv6) {
-        this.ipv6 = ipv6;
+    /**
+     * Setters
+     */
+    public void setIp(String ip) {
+        this.ip= ip;
     }
 
     public void setPseudo(String pseudo) {
         this.pseudo = pseudo;
     }
 
-    public void setStatut(int statut) {
-        this.statut = statut;
-    }
-
     public void setId(int id) {
         this.id = id;
     }
 
-    // Methodes
+    public void setPort(int port) {
+        this.port = port;
+    }
 
-    // Surcharge de toString
-    @Override
-    public String toString() {
-        return "Pseudo : " +pseudo+ ", statut : " +statut+ ", IPv4 : " +ipv4+ ", IPv6 : " +ipv6+ ", id : " +id;
+    /**
+     * Methodes
+     */
+    // Cette methode renvoie une version de l'utilisateur pouvant etre exporté.
+    public UtilisateurSimple creerUtilisateurSimple(){
+        UtilisateurSimple u = new UtilisateurSimple(this.ip, this.pseudo);
+        return u;
+    }
+
+    // Fermer le socket
+    public void fermer(){
+        socketAnnuaire.close();
     }
 }
