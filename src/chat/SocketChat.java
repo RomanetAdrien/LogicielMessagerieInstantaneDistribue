@@ -1,9 +1,16 @@
-package texte;
+package chat;
 
+import voix.client.ClientVoix;
+import chat.voix.player_thread;
+import chat.voix.recorder_thread;
+import voix.server.ServerVoix;
+
+import javax.sound.sampled.*;
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
+import java.net.*;
 import java.util.Date;
 
 
@@ -13,7 +20,7 @@ import java.util.Date;
  *
  */
 
-public class SocketTexte extends Thread{
+public class SocketChat extends Thread{
     /**
      * Variables
      */
@@ -32,7 +39,11 @@ public class SocketTexte extends Thread{
     String monPseudo = ApplicationTexte.monPseudo;
     // Adresse et port distant
     String ip;
-    int port;
+    int port_text;
+    int port_vocal;
+
+    TargetDataLine audio_in;
+    public SourceDataLine audio_out;
 
     // lien vers l'interface
     private ClientGUI gui;
@@ -41,9 +52,10 @@ public class SocketTexte extends Thread{
      * Constructeur
      */
     // Socket de connexion entrante
-    public SocketTexte(Socket socket){
+    public SocketChat(Socket socket, int portV){
+        this.port_vocal = portV;
         // On créer l'identifiant unique
-        id = ++ServerTexte.uniqueID;
+        id = ++ServerChat.uniqueID;
         // on recupère le socket
         this.socket = socket;
         // Creation du flux
@@ -69,9 +81,10 @@ public class SocketTexte extends Thread{
     }
 
     // Socket de connexion sortante
-    public SocketTexte(String server, int port){
+    public SocketChat(String server, int portT, int portV){
         this.ip = server;
-        this.port = port;
+        this.port_text = portT;
+        this.port_vocal = portV;
         boolean s = connexionSortante();
     }
 
@@ -118,6 +131,27 @@ public class SocketTexte extends Thread{
                     case Message.LOGOUT:
                         display(usernameClient + " disconnected with a LOGOUT message.", 1);
                         keepGoing = false;
+                        break;
+                    case Message.CALLDEMAND:
+                        display(usernameClient + " Appel entrant", 1);
+                        int a = JOptionPane.showConfirmDialog(gui, "Accepter l'appel", "Appelle entrant de "+usernameClient, JOptionPane.YES_NO_OPTION);
+                        if(a==JOptionPane.YES_OPTION){
+                            Message msg = new Message(Message.CALLACCEPT, "");
+                            writeMsg(msg);
+                            init_audio();
+                        }
+                        break;
+                    case Message.CALLACCEPT:
+                        display(usernameClient + " Appel accepté", 1);
+                        init_audio();
+                        break;
+                    case Message.CALLCLOSE:
+                        display(usernameClient + " Fin de l'appel", 1);
+                        ApplicationTexte.callingRecorder = false;
+                        ApplicationTexte.callingPlayer = false;
+                        gui.setMuteCallButton(false);
+                        gui.setStopCallButton(false);
+                        gui.setStartCallButton(true);
                         break;
 
                 }
@@ -186,7 +220,7 @@ public class SocketTexte extends Thread{
     private boolean connexionSortante(){
         // On essaye de se connecter au client
         try {
-            socket = new Socket(ip, port);
+            socket = new Socket(ip, port_text);
         }
         // Si ce la échoue
         catch(Exception ec) {
@@ -233,5 +267,52 @@ public class SocketTexte extends Thread{
         else if (type == 2){
             System.out.println(str);
         }
+    }
+
+    public void init_audio(){
+        try {
+            AudioFormat format = ApplicationTexte.getAudioFormat();
+            // Audio entrant
+            DataLine.Info info_in = new DataLine.Info(TargetDataLine.class, format);
+            if(!AudioSystem.isLineSupported(info_in)){
+                System.out.println("no support");
+                System.exit(0);
+            }
+            audio_in = (TargetDataLine) AudioSystem.getLine(info_in);
+            audio_in.open(format);
+            audio_in.start();
+            recorder_thread r = new recorder_thread();
+            InetAddress inet = socket.getInetAddress();
+            r.audio_in = audio_in;
+            r.dout = new DatagramSocket();
+            r.server_ip = inet;
+            r.server_port = port_vocal;
+            ApplicationTexte.callingRecorder = true;
+            r.start();
+
+            // Audio sortant
+            DataLine.Info info_out = new DataLine.Info(SourceDataLine.class, format);
+            if(!AudioSystem.isLineSupported(info_out)){
+                System.out.println("no support");
+                System.exit(0);
+            }
+            audio_out = (SourceDataLine) AudioSystem.getLine(info_out);
+            audio_out.open(format);
+            audio_out.start();
+            player_thread p = new player_thread();
+            p.din = new DatagramSocket(port_vocal);
+            p.audio_out = audio_out;
+            ApplicationTexte.callingPlayer = true;
+            p.start();
+
+            gui.setStartCallButton(false);
+            gui.setStopCallButton(true);
+            gui.setMuteCallButton(true);
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
     }
 }

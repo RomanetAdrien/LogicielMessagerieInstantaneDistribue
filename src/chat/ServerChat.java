@@ -1,4 +1,4 @@
-package texte;
+package chat;
 
 
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.util.Date;
  * Créer par Antoine le 01/04/2018
  * Le server qui attends la connexion d'un client pour discuter
  */
-public class ServerTexte implements Runnable {
+public class ServerChat implements Runnable {
     /**
      * Variables
      */
@@ -20,16 +20,19 @@ public class ServerTexte implements Runnable {
     // La date et l'heure
     private SimpleDateFormat sdf;
     // Le port d'écoute
-    private int port;
+    private int portT;
+    // le port voix;
+    private int portV;
     // Le boolean qui permet d'eteindre le serveur
     private boolean keepGoing;
 
     /**
      * Constructeur
      */
-    public ServerTexte(int port){
+    public ServerChat(int portT, int portV){
         // On initialise le port
-        this.port = port;
+        this.portT = portT;
+        this.portV = portV;
         // On initialise le format de la date
         sdf = new SimpleDateFormat("HH:mm:ss");
     }
@@ -46,19 +49,19 @@ public class ServerTexte implements Runnable {
         try
         {
             // Le socket du serveur
-            ServerSocket serverSocket = new ServerSocket(port);
+            ServerSocket serverSocket = new ServerSocket(portT);
 
             // Boucle infini pour attendre une connexion
             while(keepGoing)
             {
                 // Attends une connexion
-                System.out.println("Server Texte waiting for Clients on port " + port + ".");
+                System.out.println("Server Texte waiting for Clients on port " + portT + ".");
 
                 Socket socket = serverSocket.accept();  	// accept connection
                 // if I was asked to stop
                 if(!keepGoing)
                     break;
-                ConversationTexte t = new ConversationTexte(socket);  // make a thread of it
+                ConversationTexte t = new ConversationTexte(socket, portV);  // make a thread of it
                 ApplicationTexte.ConversationTexteList.add(t);									// save it in the ArrayList
                 t.start();
             }

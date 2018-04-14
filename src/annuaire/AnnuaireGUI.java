@@ -52,7 +52,8 @@ public class AnnuaireGUI extends JFrame implements ActionListener {
 
         northPanel.add(serverAndPort);
         northPanel.add(jComboBox);
-        
+
+
         JPanel boutonsCom = new JPanel(new GridLayout(1,2, 1, 3));
         txt = new JButton("Conversation texte");
         txt.addActionListener(this);
@@ -115,7 +116,7 @@ public class AnnuaireGUI extends JFrame implements ActionListener {
             System.out.println(Application.portTexte);
             String ip = u.getIp().substring(1,u.getIp().length());
             System.out.println(ip);
-            Application.appTexte.nouveauChat(ip,Application.portTexte);
+            Application.appTexte.nouveauChat(ip,Application.portTexte, Application.portVoix);
         }
         if (o == call){
             // TODO : ajouter appelle voix

@@ -1,18 +1,17 @@
-package texte;
+package chat;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class ConversationTexte extends Thread{
     /**
      * Variables
      */
     // Socket
-    private SocketTexte s;
+    private SocketChat s;
     // Mon pseudo
     private String monPseudo;
     // L'interface graphique
@@ -23,13 +22,13 @@ public class ConversationTexte extends Thread{
      * Constructeurs
      */
     // Contructeur pour les connexions entrantes
-    public ConversationTexte(Socket so){
-        s = new SocketTexte(so);
+    public ConversationTexte(Socket so, int portV){
+        s = new SocketChat(so, portV);
         s.start();
     }
     // Constructeur pour les connexions sortantes
-    public ConversationTexte(String ip, int port){
-        s = new SocketTexte(ip,port);
+    public ConversationTexte(String ip, int portT, int portV){
+        s = new SocketChat(ip,portT, portV);
         s.start();
     }
 
@@ -51,7 +50,7 @@ class ClientGUI extends JFrame implements ActionListener {
 
     private static final long serialVersionUID = 1L;
     // will first hold "Username:", later on "Enter message"
-    private JLabel label;
+    private JLabel labelVocal, labelTexte;
     // to hold the Username and later on the messages
     private JTextField tf;
     // to Logout and get the list of the users
@@ -61,10 +60,19 @@ class ClientGUI extends JFrame implements ActionListener {
     // if it is for connection
     private boolean connected;
     // Socket
-    private SocketTexte s;
+    private SocketChat s;
+
+    // Boutons pour les appels
+    private JButton startCallButton;
+    private JButton stopCallButton;
+    private JButton muteCallButton;
+
+    // Gestion du mute micro
+    private boolean mute = false;
+
 
     // Constructor connection receiving a socket number
-    ClientGUI(SocketTexte s) {
+    ClientGUI(SocketChat s) {
 
         super("Chat Client");
 
@@ -74,12 +82,30 @@ class ClientGUI extends JFrame implements ActionListener {
         // The NorthPanel with:
         JPanel northPanel = new JPanel(new GridLayout(3, 1));
 
-        // the Label and the TextField
-        label = new JLabel("Ecrivez le message ci dessous", SwingConstants.CENTER);
-        northPanel.add(label);
+        // Partie vocale
+        labelVocal = new JLabel("Conversation Vocale", SwingConstants.CENTER);
+        northPanel.add(labelVocal);
+        JPanel vocal = new JPanel(new GridLayout(1,3));
+        startCallButton = new JButton("Appeller");
+        startCallButton.addActionListener(this);
+        stopCallButton = new JButton("Racrocher");
+        stopCallButton.addActionListener(this);
+        muteCallButton = new JButton("Muter");
+        muteCallButton.addActionListener(this);
+        vocal.add(startCallButton);
+        vocal.add(stopCallButton);
+        vocal.add(muteCallButton);
+        northPanel.add(vocal);
+
+        // Partie Texte
+        JPanel texte = new JPanel(new GridLayout(2,1));
+        labelTexte = new JLabel("Ecrivez le message ci dessous", SwingConstants.CENTER);
+        texte.add(labelTexte);
         tf = new JTextField("");
         tf.setBackground(Color.WHITE);
-        northPanel.add(tf);
+        texte.add(tf);
+        northPanel.add(texte);
+
         add(northPanel, BorderLayout.NORTH);
 
         // The CenterPanel which is the chat room
@@ -89,8 +115,8 @@ class ClientGUI extends JFrame implements ActionListener {
         ta.setEditable(false);
         add(centerPanel, BorderLayout.CENTER);
 
-        // the 3 buttons
-        logout = new JButton("Logout");
+        // Le bouton pour quitter
+        logout = new JButton("Fermer");
         logout.addActionListener(this);
         logout.setEnabled(false);        // you have to login before being able to logout
 
@@ -105,6 +131,11 @@ class ClientGUI extends JFrame implements ActionListener {
 
         // On dit que l'on est connecté
         connected = true;
+
+        // Etat initial des boutons
+        startCallButton.setEnabled(true);
+        stopCallButton.setEnabled(false);
+        muteCallButton.setEnabled(false);
         // On active le bouton de deconnexion
         logout.setEnabled(true);
         // On regarde les actions sur le champ message
@@ -148,14 +179,51 @@ class ClientGUI extends JFrame implements ActionListener {
             dispose();
             return;
         }
+        if (o == startCallButton){
+            try {
+                s.writeMsg(new Message(Message.CALLDEMAND, ""));
+                append("Demande d'appel vocal");
+            }catch (Exception err){
+
+            }
+            return;
+        }
+        if (o == stopCallButton){
+            s.writeMsg(new Message(Message.CALLCLOSE, ""));
+            ApplicationTexte.callingRecorder = false;
+            ApplicationTexte.callingPlayer = false;
+            startCallButton.setEnabled(true);
+            stopCallButton.setEnabled(false);
+            muteCallButton.setEnabled(false);
+        }
+        if (o == muteCallButton){
+            if(!mute) {
+                ApplicationTexte.callingRecorder = false;
+                mute = true;
+            }
+            else if(mute){
+                ApplicationTexte.callingRecorder = true;
+                s.init_audio();
+            }
+        }
 
         // ok it is coming from the JTextField
-        if (connected) {
+        if (connected && o!= stopCallButton && o!=muteCallButton) {
             // just have to send the message
             s.writeMsg(new Message(Message.MESSAGE, tf.getText()));
             append("Moi : " + tf.getText());
             tf.setText("");
             return;
         }
+    }
+
+    public void setStartCallButton(boolean b){
+        startCallButton.setEnabled(b);
+    }
+    public void setStopCallButton(boolean b){
+        stopCallButton.setEnabled(b);
+    }
+    public void setMuteCallButton(boolean b){
+        muteCallButton.setEnabled(b);
     }
 }

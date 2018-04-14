@@ -1,22 +1,21 @@
-package voix;
+package chat;
 
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.Mixer;
-import javax.sound.sampled.TargetDataLine;
 import java.io.Serializable;
 
 /**
- * Created by Malomek on 07/04/2018.
+ * Cette classe définit les échanges attendu entre les clients Texte
  */
-public class Message implements Serializable{
+public class Message implements Serializable {
 
     protected static final long serialVersionUID = 1112122200L;
 
     // Les types de messages
     // MESSAGE un simple message texte
     // LOGOUT MessageAnnuaire de déconnexion
-    public static final int MESSAGE = 0, LOGOUT = 1;
+    // CALLDEMAND
+    // CALLACCEPT
+    // CALLCLOSE
+    public static final int MESSAGE = 0, LOGOUT = 1, CALLDEMAND = 2, CALLACCEPT = 3, CALLCLOSE = 4;
     private int type;
     private String message;
 
@@ -34,5 +33,6 @@ public class Message implements Serializable{
     public String getMessage() {
         return message;
     }
+
 
 }
