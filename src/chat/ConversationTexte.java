@@ -50,7 +50,8 @@ class ClientGUI extends JFrame implements ActionListener {
 
     private static final long serialVersionUID = 1L;
     // will first hold "Username:", later on "Enter message"
-    private JLabel labelVocal, labelTexte;
+    public JLabel labelVocal;
+    private JLabel labelTexte;
     // to hold the Username and later on the messages
     private JTextField tf;
     // to Logout and get the list of the users
@@ -80,7 +81,7 @@ class ClientGUI extends JFrame implements ActionListener {
         JPanel northPanel = new JPanel(new GridLayout(3, 1));
 
         // Partie vocale
-        labelVocal = new JLabel("Conversation Vocale", SwingConstants.CENTER);
+        labelVocal = new JLabel("Conversation avec "+s.usernameClient , SwingConstants.CENTER);
         northPanel.add(labelVocal);
         JPanel vocal = new JPanel(new GridLayout(1,3));
         startCallButton = new JButton("Appeller");
@@ -106,7 +107,7 @@ class ClientGUI extends JFrame implements ActionListener {
         add(northPanel, BorderLayout.NORTH);
 
         // The CenterPanel which is the chat room
-        ta = new JTextArea("Welcome to the Chat room\n", 80, 80);
+        ta = new JTextArea("\n", 80, 80);
         JPanel centerPanel = new JPanel(new GridLayout(1, 1));
         centerPanel.add(new JScrollPane(ta));
         ta.setEditable(false);
@@ -227,4 +228,5 @@ class ClientGUI extends JFrame implements ActionListener {
     public void setMuteCallButton(boolean b){
         muteCallButton.setEnabled(b);
     }
+
 }

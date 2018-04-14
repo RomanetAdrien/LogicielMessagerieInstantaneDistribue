@@ -82,6 +82,7 @@ public class AnnuaireGUI extends JFrame implements ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(600, 600);
         setVisible(true);
+        login.requestFocus();
     }
 
     /**
@@ -103,6 +104,7 @@ public class AnnuaireGUI extends JFrame implements ActionListener {
         Object o = e.getSource();
         if( o == login){
             parent.connexion(tfServer.getText(), Integer.parseInt(tfPort.getText()));
+            actualiserListeUtilisateur();
         }
         if( o == actualiser){
             actualiserListeUtilisateur();

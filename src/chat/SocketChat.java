@@ -134,7 +134,11 @@ public class SocketChat extends Thread{
                         display(usernameClient + " : " + message, 1);
                         break;
                     case Message.LOGOUT:
-                        display(usernameClient + " disconnected with a LOGOUT message.", 1);
+                        display(usernameClient + " Deconnecte avec un LOGOUT message.", 1);
+                        if(ApplicationTexte.calling){
+                            display(usernameClient + " Fin de l'appel", 1);
+                            close_audio();
+                        }
                         keepGoing = false;
                         break;
                     case Message.CALLDEMAND:
