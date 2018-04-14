@@ -20,16 +20,17 @@ public class recorder_thread extends Thread {
     @Override
     public void run(){
         int i = 0;
-        while(ApplicationTexte.callingRecorder){
-            try {
-                audio_in.read(byte_buff, 0, byte_buff.length);
-                DatagramPacket data = new DatagramPacket(byte_buff, byte_buff.length, server_ip, server_port);
-                //System.out.println("send : #"+i++);
-                dout.send(data);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("test");
-            }
+        while(ApplicationTexte.calling){
+
+                try {
+                    audio_in.read(byte_buff, 0, byte_buff.length);
+                    DatagramPacket data = new DatagramPacket(byte_buff, byte_buff.length, server_ip, server_port);
+                    System.out.println("send : #"+i++);
+                    if (!ApplicationTexte.callingMute) dout.send(data);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
 
         }
         audio_in.close();

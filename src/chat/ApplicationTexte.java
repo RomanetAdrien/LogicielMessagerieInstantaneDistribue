@@ -19,8 +19,8 @@ public class ApplicationTexte{
     public static String monPseudo;
 
     // Pour savoir si on a un appel en cours
-    public static boolean callingPlayer = false;
-    public static boolean callingRecorder = false;
+    public static boolean calling = false;
+    public static boolean callingMute = false;
 
     /**
      * Constructeur

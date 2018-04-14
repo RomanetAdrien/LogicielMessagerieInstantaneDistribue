@@ -1,5 +1,6 @@
 package chat;
 
+import application.Application;
 import voix.client.ClientVoix;
 import chat.voix.player_thread;
 import chat.voix.recorder_thread;
@@ -114,6 +115,10 @@ public class SocketChat extends Thread{
                 try {
                     cm = (Message) sInput.readObject();
                 } catch (IOException e) {
+                    if (ApplicationTexte.calling){
+                        close_audio();
+                        gui.append("Fin de l'appel");
+                    }
                     display(usernameClient + " Exception reading Streams: " + e, 2);
                     break;
                 } catch (ClassNotFoundException e2) {
@@ -147,11 +152,7 @@ public class SocketChat extends Thread{
                         break;
                     case Message.CALLCLOSE:
                         display(usernameClient + " Fin de l'appel", 1);
-                        ApplicationTexte.callingRecorder = false;
-                        ApplicationTexte.callingPlayer = false;
-                        gui.setMuteCallButton(false);
-                        gui.setStopCallButton(false);
-                        gui.setStartCallButton(true);
+                        close_audio();
                         break;
 
                 }
@@ -271,6 +272,7 @@ public class SocketChat extends Thread{
 
     public void init_audio(){
         try {
+            ApplicationTexte.calling = true;
             AudioFormat format = ApplicationTexte.getAudioFormat();
             // Audio entrant
             DataLine.Info info_in = new DataLine.Info(TargetDataLine.class, format);
@@ -287,7 +289,6 @@ public class SocketChat extends Thread{
             r.dout = new DatagramSocket();
             r.server_ip = inet;
             r.server_port = port_vocal;
-            ApplicationTexte.callingRecorder = true;
             r.start();
 
             // Audio sortant
@@ -302,7 +303,6 @@ public class SocketChat extends Thread{
             player_thread p = new player_thread();
             p.din = new DatagramSocket(port_vocal);
             p.audio_out = audio_out;
-            ApplicationTexte.callingPlayer = true;
             p.start();
 
             gui.setStartCallButton(false);
@@ -313,6 +313,15 @@ public class SocketChat extends Thread{
         } catch (SocketException e) {
             e.printStackTrace();
         }
-
+    }
+    public void close_audio(){
+        audio_in.close();
+        audio_in.drain();
+        audio_out.close();
+        audio_out.drain();
+        ApplicationTexte.calling =false;
+        gui.setMuteCallButton(false);
+        gui.setStopCallButton(false);
+        gui.setStartCallButton(true);
     }
 }

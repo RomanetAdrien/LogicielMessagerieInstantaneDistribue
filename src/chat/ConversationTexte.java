@@ -67,9 +67,6 @@ class ClientGUI extends JFrame implements ActionListener {
     private JButton stopCallButton;
     private JButton muteCallButton;
 
-    // Gestion du mute micro
-    private boolean mute = false;
-
 
     // Constructor connection receiving a socket number
     ClientGUI(SocketChat s) {
@@ -190,20 +187,24 @@ class ClientGUI extends JFrame implements ActionListener {
         }
         if (o == stopCallButton){
             s.writeMsg(new Message(Message.CALLCLOSE, ""));
-            ApplicationTexte.callingRecorder = false;
-            ApplicationTexte.callingPlayer = false;
+            s.close_audio();
+            append("Fin de l'appel");
+            ApplicationTexte.calling = false;
+            ApplicationTexte.callingMute = false;
             startCallButton.setEnabled(true);
             stopCallButton.setEnabled(false);
             muteCallButton.setEnabled(false);
         }
         if (o == muteCallButton){
-            if(!mute) {
-                ApplicationTexte.callingRecorder = false;
-                mute = true;
+            if(ApplicationTexte.callingMute) {
+                ApplicationTexte.callingMute = false;
+                muteCallButton.setText("Muter le micro");
+                append("" + ApplicationTexte.callingMute);
             }
-            else if(mute){
-                ApplicationTexte.callingRecorder = true;
-                s.init_audio();
+            else if(!ApplicationTexte.callingMute){
+                ApplicationTexte.callingMute = true;
+                muteCallButton.setText("Demuter le micro");
+                append("" + ApplicationTexte.callingMute);
             }
         }
 

@@ -17,7 +17,7 @@ public class player_thread extends Thread {
     @Override
     public void run(){
         DatagramPacket incomming = new DatagramPacket(buffer, buffer.length);
-        while (ApplicationTexte.callingPlayer){
+        while (ApplicationTexte.calling){
             try {
                 din.receive(incomming);
                 buffer = incomming.getData();
@@ -28,6 +28,7 @@ public class player_thread extends Thread {
         }
         audio_out.close();
         audio_out.drain();
+        din.close();
         System.out.println("thread player stopped");
     }
 }
