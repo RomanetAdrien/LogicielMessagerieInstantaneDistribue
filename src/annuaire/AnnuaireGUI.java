@@ -21,7 +21,7 @@ public class AnnuaireGUI extends JFrame implements ActionListener {
     // Les conteneur pour l'adresse et le port d'un noeud du réseau
     private JTextField tfServer, tfPort;
     // Les boutons
-    private JButton login, logout, actualiser, txt, call;
+    private JButton login, actualiser, txt;
     // Liste des Utilisateurs connectés
     private ArrayList<UtilisateurSimple> listeUtilisateursConnectes;
     private JComboBox<UtilisateurSimple> jComboBox;
@@ -54,13 +54,10 @@ public class AnnuaireGUI extends JFrame implements ActionListener {
         northPanel.add(jComboBox);
 
 
-        JPanel boutonsCom = new JPanel(new GridLayout(1,2, 1, 3));
-        txt = new JButton("Conversation texte");
+        JPanel boutonsCom = new JPanel(new GridLayout(1,1, 1, 3));
+        txt = new JButton("Nouvelle conversation");
         txt.addActionListener(this);
-        call = new JButton("Conversation vocale");
-        call.addActionListener(this);
         boutonsCom.add(txt);
-        boutonsCom.add(call);
         northPanel.add(boutonsCom);
         add(northPanel, BorderLayout.NORTH);
 
@@ -69,20 +66,16 @@ public class AnnuaireGUI extends JFrame implements ActionListener {
         login.addActionListener(this);
         actualiser = new JButton("Actualiser");
         actualiser.addActionListener(this);
-        logout = new JButton("Logout");
-        logout.addActionListener(this);
-        logout.setEnabled(false);		// you have to login before being able to logout
+        actualiser.setEnabled(false);
 
         JPanel southPanel = new JPanel();
         southPanel.add(login);
         southPanel.add(actualiser);
-        southPanel.add(logout);
         add(southPanel, BorderLayout.SOUTH);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(600, 600);
         setVisible(true);
-        login.requestFocus();
     }
 
     /**
@@ -105,12 +98,11 @@ public class AnnuaireGUI extends JFrame implements ActionListener {
         if( o == login){
             parent.connexion(tfServer.getText(), Integer.parseInt(tfPort.getText()));
             actualiserListeUtilisateur();
+            login.setEnabled(false);
+            actualiser.setEnabled(true);
         }
         if( o == actualiser){
             actualiserListeUtilisateur();
-        }
-        if ( o == logout){
-            ApplicationAnnuaire.annuaire.fermerLesConnexions();
         }
         if ( o == txt){
             UtilisateurSimple u = listeUtilisateursConnectes.get(jComboBox.getSelectedIndex());
@@ -119,9 +111,6 @@ public class AnnuaireGUI extends JFrame implements ActionListener {
             String ip = u.getIp().substring(1,u.getIp().length());
             System.out.println(ip);
             Application.appTexte.nouveauChat(ip,Application.portTexte, Application.portVoix);
-        }
-        if (o == call){
-            // TODO : ajouter appelle voix
         }
     }
 }

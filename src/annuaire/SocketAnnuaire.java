@@ -87,6 +87,7 @@ public class SocketAnnuaire extends Thread{
                 cm = (MessageAnnuaire) sInput.readObject();
             } catch (IOException e) {
                 System.out.println(pseudoDistant + " Exception reading Streams: " + e);
+                close();
                 break;
             } catch (ClassNotFoundException e2) {
                 break;

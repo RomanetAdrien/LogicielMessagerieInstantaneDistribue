@@ -49,14 +49,15 @@ public class Annuaire {
     public void supprimerUtilisateur(Utilisateur user){
         user.fermer();
         tab.remove(user);
+        ApplicationAnnuaire.gui.actualiserListeUtilisateur();
     }
 
     // On ferme toutes les connexions
     public void fermerLesConnexions(){
         for(int i=tab.size()-1 ; i>=0 ; i--){
             tab.get(i).fermer();
-            tab.remove(i);
         }
+        tab.removeAll(tab);
     }
 
     // On veut la taille de l'annuaire

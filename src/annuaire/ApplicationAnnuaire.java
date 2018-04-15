@@ -7,18 +7,18 @@ public class ApplicationAnnuaire {
     protected static Annuaire annuaire;
     public static String monPseudo;
     private ServeurAnnuaire serveur;
-    private AnnuaireGUI gui;
+    public static AnnuaireGUI gui;
 
     /**
      * Constructeur
      */
     public ApplicationAnnuaire(String pseudo,int port){
         annuaire = new Annuaire();
-        serveur = new ServeurAnnuaire(port);
         monPseudo = pseudo;
+        gui = new AnnuaireGUI(this);
+        serveur = new ServeurAnnuaire(port);
         // On demmare le serveur
         serveur.start();
-        gui = new AnnuaireGUI(this);
     }
 
     /**

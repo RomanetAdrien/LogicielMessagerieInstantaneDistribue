@@ -52,8 +52,10 @@ public class ServeurAnnuaire extends Thread{
                 // if I was asked to stop
                 if(!keepGoing)
                     break;
-                if(socket.getInetAddress().toString() != "/127.0.0.1")
-                ApplicationAnnuaire.annuaire.ajouterNouveauUtilisateur(socket);
+                if(socket.getInetAddress().toString() != "/127.0.0.1") {
+                    ApplicationAnnuaire.annuaire.ajouterNouveauUtilisateur(socket);
+                    ApplicationAnnuaire.gui.actualiserListeUtilisateur();
+                }
             }
             // I was asked to stop
             try {
